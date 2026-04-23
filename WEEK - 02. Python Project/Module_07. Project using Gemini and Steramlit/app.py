@@ -1,5 +1,9 @@
 import streamlit as st
-st.header("Notes Summarry and Quiz Generator", anchor=False)
+from api_calling import note_generator, audio_transcription, quiz_generator
+from PIL import Image
+
+
+st.header("Notes Summary and Quiz Generator", anchor=False)
 st.markdown("Upload upto 3 images to generate Note summarray and Quizzes")
 st.divider()
 
@@ -13,6 +17,9 @@ with st.sidebar:
         accept_multiple_files=True
     )
     st.subheader("Your uploaded Images")
+    
+    pill_images = [Image.open(x) for x in images]
+    
     if images:
         if len(images) > 3:
             st.error("Upload at max 3 images")
@@ -42,16 +49,30 @@ if ini_button:
     if images and selected:
         
         with st.container(border=True):
-            st.subheader("Your Note", anchor=False)
-            st.text("Note will be shown")
+            st.subheader("Your Note's Summary", anchor=False)
+            
+            with st.spinner("AI is writing notes for you"):
+                generated_notes = note_generator(pill_images)
+                st.markdown(generated_notes)
 
         with st.container(border=True):
             st.subheader("Audio Transcription", anchor=False)
-            st.text("Will be shown here.")
+            
+            with st.spinner("AI is transcriptioning Audio for you"):
+                generated_notes = generated_notes.replace("#", "")
+                generated_notes = generated_notes.replace("*", "")
+                generated_notes = generated_notes.replace("-", "")
+                generated_notes = generated_notes.replace("`", "")
+                
+                generated_audio = audio_transcription(generated_notes)
+                st.audio(generated_audio)
        
             
         with st.container(border=True):
-            st.subheader(f"Quiz ({selected}) Difficulty", anchor=False)
-            st.text("Will be shown here.")
+            st.subheader(f"Quiz ({selected})", anchor=False)
+            
+            with st.spinner("AI is making Quizzes for you"):
+                generated_quiz = quiz_generator(pill_images, selected)
+                st.markdown(generated_quiz)
     
     
