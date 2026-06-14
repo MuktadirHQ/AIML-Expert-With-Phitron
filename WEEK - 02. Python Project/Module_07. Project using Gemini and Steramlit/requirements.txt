@@ -1,7 +1,0 @@
-streamlit
-google-genai
-rich
-markdown-it-py
-python-dotenv
-gtts
-pillow
